@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Code Learning Assistant - AI-Powered Developer Tool</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1>🤖 Code Learning Assistant</h1>
+            <p>AI-powered tool to help you learn faster and work smarter with code</p>
+        </header>
+
+        <div class="main-content">
+            <div class="input-section">
+                <div class="controls">
+                    <select id="languageSelect" class="language-select">
+                        <option value="javascript">JavaScript</option>
+                        <option value="python">Python</option>
+                        <option value="java">Java</option>
+                        <option value="cpp">C++</option>
+                        <option value="html">HTML</option>
+                        <option value="css">CSS</option>
+                    </select>
+                    <button id="analyzeBtn" class="analyze-btn">🔍 Analyze Code</button>
+                    <button id="clearBtn" class="clear-btn">🗑️ Clear</button>
+                </div>
+                
+                <textarea 
+                    id="codeInput" 
+                    placeholder="Paste your code here to get AI-powered insights, explanations, and learning suggestions..."
+                    class="code-input"
+                ></textarea>
+            </div>
+
+            <div class="results-section" id="resultsSection" style="display: none;">
+                <div class="analysis-grid">
+                    <div class="analysis-card">
+                        <h3>📊 Code Analysis</h3>
+                        <div id="analysisContent"></div>
+                    </div>
+                    
+                    <div class="analysis-card">
+                        <h3>💡 AI Explanation</h3>
+                        <div id="explanationContent"></div>
+                    </div>
+                    
+                    <div class="analysis-card">
+                        <h3>🎯 Learning Points</h3>
+                        <div id="learningContent"></div>
+                    </div>
+                    
+                    <div class="analysis-card">
+                        <h3>🚀 Suggestions</h3>
+                        <div id="suggestionsContent"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="learning-paths-section">
+                <h2>📚 Learning Paths</h2>
+                <div id="learningPaths" class="learning-paths-grid"></div>
+            </div>
+        </div>
+
+        <div class="loading" id="loading" style="display: none;">
+            <div class="spinner"></div>
+            <p>Analyzing your code with AI...</p>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
