@@ -13,23 +13,35 @@ An AI-powered tool that helps developers learn faster, work smarter, and underst
 
 ## 🚀 Quick Start
 
-1. **Install Dependencies**
+1. **Fix Git Remote** (if you see "repository not found" error)
+   ```bash
+   # Check your current remote URL
+   git remote -v
+   
+   # Update with your actual GitHub username
+   git remote set-url origin https://github.com/YOUR_GITHUB_USERNAME/ai-learning-tool.git
+   
+   # Then push
+   git push -u origin main
+   ```
+
+2. **Install Dependencies**
    ```bash
    npm install
    ```
 
-2. **Set Up Environment** (Optional)
+3. **Set Up Environment** (Optional)
    ```bash
    cp .env.example .env
    # Edit .env with your configuration
    ```
 
-3. **Start the Application**
+4. **Start the Application**
    ```bash
    npm start
    ```
 
-4. **Open Your Browser**
+5. **Open Your Browser**
    Navigate to `http://localhost:3000`
 
 ## 🛠️ Development
@@ -48,6 +60,19 @@ npm run dev
    - Pattern detection
    - Learning explanations
    - Improvement suggestions
+4. **Interactive Learning**: Click "Start Learning 🚀" on any learning path to open an AI chatbot
+5. **Ask Questions**: The chatbot will answer your questions about the topic with examples and explanations
+
+## 🤖 Using the Learning Chatbot
+
+1. Scroll to the "Learning Paths" section
+2. Choose a path: JavaScript Fundamentals, React Development, or Node.js Backend
+3. Click "Start Learning 🚀" to open the chatbot modal
+4. Ask questions using keywords like:
+   - **JavaScript**: variables, functions, arrays, objects, async
+   - **React**: components, state, hooks, props, jsx
+   - **Node.js**: express, api, database, authentication, middleware
+5. Get instant explanations with code examples!
 
 ## 🎯 Use Cases
 
