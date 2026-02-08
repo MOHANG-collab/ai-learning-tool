@@ -38,6 +38,16 @@ class CodeLearningAssistant {
                 this.analyzeCode();
             }
         });
+
+        // Chatbot events
+        const chatInput = document.getElementById('chatInput');
+        if (chatInput) {
+            chatInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    this.sendChatMessage();
+                }
+            });
+        }
     }
 
     loadSampleCode() {
@@ -144,7 +154,7 @@ numbers.forEach(num => {
                     <div class="topics">
                         ${path.topics.map(topic => `<span class="topic-tag">${topic}</span>`).join('')}
                     </div>
-                    <button class="start-learning-btn" onclick="alert('Learning path: ${path.title}')">
+                    <button class="start-learning-btn" onclick="window.learningAssistant.openChatbot('${path.title}', ${path.id})">
                         Start Learning 🚀
                     </button>
                 </div>
@@ -152,6 +162,89 @@ numbers.forEach(num => {
             
         } catch (error) {
             console.error('Error loading learning paths:', error);
+        }
+    }
+
+    openChatbot(pathTitle, pathId) {
+        console.log('Opening chatbot for:', pathTitle, pathId);
+        const modal = document.getElementById('chatbotModal');
+        const chatTitle = document.getElementById('chatbotTitle');
+        const chatMessages = document.getElementById('chatMessages');
+        
+        if (!modal) {
+            console.error('Chatbot modal not found!');
+            alert('Chatbot modal not found. Please refresh the page.');
+            return;
+        }
+        
+        chatTitle.textContent = pathTitle;
+        chatMessages.innerHTML = '';
+        
+        // Add welcome message
+        this.addChatMessage('bot', `Welcome to ${pathTitle}! I'm your AI learning assistant. Ask me anything about this topic, and I'll help you understand it better. What would you like to learn first?`);
+        
+        modal.style.display = 'flex';
+        document.getElementById('chatInput').focus();
+        
+        // Store current path
+        this.currentLearningPath = pathId;
+        console.log('Chatbot opened successfully');
+    }
+
+    closeChatbot() {
+        document.getElementById('chatbotModal').style.display = 'none';
+    }
+
+    addChatMessage(sender, message) {
+        const chatMessages = document.getElementById('chatMessages');
+        const messageDiv = document.createElement('div');
+        messageDiv.className = `chat-message ${sender}-message`;
+        messageDiv.innerHTML = `
+            <div class="message-content">${message}</div>
+            <div class="message-time">${new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</div>
+        `;
+        chatMessages.appendChild(messageDiv);
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+
+    async sendChatMessage() {
+        const input = document.getElementById('chatInput');
+        const message = input.value.trim();
+        
+        if (!message) return;
+        
+        // Add user message
+        this.addChatMessage('user', message);
+        input.value = '';
+        
+        // Show typing indicator
+        const typingDiv = document.createElement('div');
+        typingDiv.className = 'chat-message bot-message typing-indicator';
+        typingDiv.innerHTML = '<div class="typing-dots"><span></span><span></span><span></span></div>';
+        document.getElementById('chatMessages').appendChild(typingDiv);
+        
+        try {
+            const response = await fetch('/api/chat', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    message: message,
+                    pathId: this.currentLearningPath
+                })
+            });
+            
+            const data = await response.json();
+            
+            // Remove typing indicator
+            typingDiv.remove();
+            
+            // Add bot response
+            this.addChatMessage('bot', data.response);
+            
+        } catch (error) {
+            typingDiv.remove();
+            this.addChatMessage('bot', 'Sorry, I encountered an error. Please try again.');
+            console.error('Chat error:', error);
         }
     }
 
@@ -179,5 +272,5 @@ numbers.forEach(num => {
 
 // Initialize the application
 document.addEventListener('DOMContentLoaded', () => {
-    new CodeLearningAssistant();
+    window.learningAssistant = new CodeLearningAssistant();
 });

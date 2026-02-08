@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Learning Assistant with Chatbot</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+        }
+        h1 { color: #333; margin-bottom: 30px; text-align: center; }
+        .learning-paths-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+        .learning-path-card {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        .learning-path-card h3 { color: #333; margin-bottom: 10px; }
+        .learning-path-card p { color: #6c757d; margin-bottom: 15px; }
+        .topics { margin-bottom: 20px; }
+        .topic-tag {
+            display: inline-block;
+            background: #28a745;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            margin: 4px 4px 4px 0;
+        }
+        .start-learning-btn {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        .start-learning-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(40, 167, 69, 0.3);
+        }
+        
+        /* Chatbot Styles */
+        .chatbot-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+        }
+        .chatbot-container {
+            background: white;
+            border-radius: 20px;
+            width: 90%;
+            max-width: 600px;
+            height: 80vh;
+            max-height: 700px;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+        .chatbot-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px 25px;
+            border-radius: 20px 20px 0 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .chatbot-header h2 { font-size: 1.3rem; margin: 0; }
+        .close-chatbot {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            font-size: 24px;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+        .close-chatbot:hover { background: rgba(255, 255, 255, 0.3); }
+        .chatbot-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            background: #f8f9fa;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        .chat-message {
+            display: flex;
+            flex-direction: column;
+            max-width: 80%;
+        }
+        .bot-message { align-self: flex-start; }
+        .user-message { align-self: flex-end; }
+        .message-content {
+            padding: 12px 18px;
+            border-radius: 18px;
+            line-height: 1.5;
+        }
+        .bot-message .message-content {
+            background: white;
+            color: #333;
+            border: 2px solid #e9ecef;
+        }
+        .user-message .message-content {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        .message-time {
+            font-size: 11px;
+            color: #6c757d;
+            margin-top: 5px;
+            padding: 0 8px;
+        }
+        .chatbot-input-area {
+            padding: 20px;
+            background: white;
+            border-radius: 0 0 20px 20px;
+            display: flex;
+            gap: 10px;
+            border-top: 2px solid #e9ecef;
+        }
+        .chatbot-input {
+            flex: 1;
+            padding: 12px 18px;
+            border: 2px solid #e1e5e9;
+            border-radius: 25px;
+            font-size: 14px;
+        }
+        .chatbot-input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        .send-btn {
+            padding: 12px 24px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 25px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        .send-btn:hover { opacity: 0.9; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📚 Learning Paths with AI Chatbot</h1>
+        
+        <div class="learning-paths-grid" id="learningPaths"></div>
+    </div>
+
+    <!-- Chatbot Modal -->
+    <div id="chatbotModal" class="chatbot-modal">
+        <div class="chatbot-container">
+            <div class="chatbot-header">
+                <h2 id="chatbotTitle">Learning Assistant</h2>
+                <button class="close-chatbot" onclick="closeChatbot()">✕</button>
+            </div>
+            <div class="chatbot-messages" id="chatMessages"></div>
+            <div class="chatbot-input-area">
+                <input 
+                    type="text" 
+                    id="chatInput" 
+                    placeholder="Ask me anything about this topic..."
+                    class="chatbot-input"
+                    onkeypress="if(event.key==='Enter') sendMessage()"
+                />
+                <button onclick="sendMessage()" class="send-btn">Send 📤</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentPathId = null;
+        
+        const learningPaths = [
+            {
+                id: 1,
+                title: 'JavaScript Fundamentals',
+                description: 'Master the basics of JavaScript programming',
+                topics: ['Variables', 'Functions', 'Objects', 'Arrays', 'Async/Await']
+            },
+            {
+                id: 2,
+                title: 'React Development',
+                description: 'Build modern web applications with React',
+                topics: ['Components', 'State Management', 'Hooks', 'Routing']
+            },
+            {
+                id: 3,
+                title: 'Node.js Backend',
+                description: 'Create robust server-side applications',
+                topics: ['Express.js', 'APIs', 'Database Integration', 'Authentication']
+            }
+        ];
+
+        // Load learning paths
+        function loadPaths() {
+            const container = document.getElementById('learningPaths');
+            container.innerHTML = learningPaths.map(path => `
+                <div class="learning-path-card">
+                    <h3>${path.title}</h3>
+                    <p>${path.description}</p>
+                    <div class="topics">
+                        ${path.topics.map(topic => `<span class="topic-tag">${topic}</span>`).join('')}
+                    </div>
+                    <button class="start-learning-btn" onclick="openChatbot('${path.title}', ${path.id})">
+                        Start Learning 🚀
+                    </button>
+                </div>
+            `).join('');
+        }
+
+        function openChatbot(title, pathId) {
+            currentPathId = pathId;
+            const modal = document.getElementById('chatbotModal');
+            const chatTitle = document.getElementById('chatbotTitle');
+            const chatMessages = document.getElementById('chatMessages');
+            
+            chatTitle.textContent = title;
+            chatMessages.innerHTML = '';
+            
+            addMessage('bot', `Welcome to ${title}! I'm your AI learning assistant. Ask me anything about this topic!`);
+            
+            modal.style.display = 'flex';
+            document.getElementById('chatInput').focus();
+        }
+
+        function closeChatbot() {
+            document.getElementById('chatbotModal').style.display = 'none';
+        }
+
+        function addMessage(sender, text) {
+            const chatMessages = document.getElementById('chatMessages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `chat-message ${sender}-message`;
+            messageDiv.innerHTML = `
+                <div class="message-content">${text}</div>
+                <div class="message-time">${new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</div>
+            `;
+            chatMessages.appendChild(messageDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        async function sendMessage() {
+            const input = document.getElementById('chatInput');
+            const message = input.value.trim();
+            
+            if (!message) return;
+            
+            addMessage('user', message);
+            input.value = '';
+            
+            try {
+                const response = await fetch('/api/chat', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message, pathId: currentPathId })
+                });
+                
+                const data = await response.json();
+                addMessage('bot', data.response);
+            } catch (error) {
+                addMessage('bot', 'Sorry, I encountered an error. Please try again.');
+            }
+        }
+
+        // Load paths on page load
+        loadPaths();
+    </script>
+</body>
+</html>
